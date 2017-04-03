@@ -1,3 +1,0 @@
-1. RCFlightLine.com
-	URL=https://rcflightline.com/rc-history/
-	
