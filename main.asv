@@ -3,7 +3,7 @@ format compact, clear, clc, close all
 rng default
 
 %% Information Sequence (Bit Stream)
-M = 10;
+M = 10; % bits per msg
 K = 4;
 D = 2;
 joy1 = round(2^M*rand(K,1)); % 0-1023 (2^M)
@@ -41,19 +41,18 @@ t = 0;
 leg = '';
 while(p<K+1)
     for q = 1:M/D
-        sbbf = zeros(1,2^M*2^D*8);
-        tmp = tones(mod(p,2^D)+1)+tones_inc(joy1_enc2(p,q));
+        sbbf = zeros(1,2^M*2^D);
+        tmp = tones(mod(p,2^D)+1)+tones_inc(joy1_enc2(p,q))
         sbbf(tmp) = 1024;
         sbb = [sbb ifft(sbbf)];
-        leg = [leg; sprintf('msg: %d, freq: %4.f',joy1_enc2(p,q),tmp)];
-        t = [t t(end):1/(8*4096):(t(end)+1-1/(8*4096))];
+        leg = [leg; sprintf('msg: %d, freq: %4.f',joy1_enc2(p,q),tmp)]
+        t = [t t(end):1/4096:(t(end)+1-1/4096)];
 %         legend(leg)
         subplot(212)
         plot(t(2:end),real(sbb(2:end)))
         title('FHSS Time signal')
         xlabel('Time (s)')
         ylabel('Amplitude')
-        xlim([t(end)-100/(8*4096) t(end)])
         subplot(211)
         plot([1000 1000],[0 1500],'k')
         hold on
@@ -66,17 +65,47 @@ while(p<K+1)
         xlim([0 4096])
 %         legend(leg)
 %         hold on
-        pause(0.75)
+        pause(1)
     end
     p = p + 1;
 end
 
 sbb = sbb(2:end);
 pause
-
-%%
 figure
-spectrogram(sbb,500,1,4096,4096*8,'yaxis');
-ylim([0 5])
-colorbar off
+spectrogram(sbb,100,10,4096,4096,'yaxis');
 
+% ylim([0 0.512])
+
+% sbbf_tones = [tones(1)+tones_inc(joy1_enc2(1))]
+% H = 2^D; % Number of Frequencies
+% 
+% Df = 10; % [Hz] Distance between frequencies
+% 
+% tones = (0:H-1)*Df+1;
+% 
+% sbb = zeros(1,(2^M)*K*M/D);
+% freqs = 0;
+% for q = 1:K
+%     for p = 1:M/D
+%         sbbf = zeros(1,2^M);
+%         freqs = [freqs tones(joy1_enc2(q,p))];
+%         sbbf(tones(joy1_enc2(q,p))) = 1024/length(joy1_enc2);
+%         sbb((1:(2^M))+(q-1)*(M/D*2^M)+(p-1)*(2^M)) = ifft(sbbf);
+%         subplot(211)
+%         hold on
+%         plot(sbbf)
+%     end
+% end
+% 
+% freqs = freqs(2:end)';
+% 
+% subplot(212)
+% plot(real(sbb))
+% 
+% figure
+% spectrogram(sbb,1024,1,1024,1024,'yaxis');
+% ylim([0 0.512])
+%% Mixer
+
+%% Channel

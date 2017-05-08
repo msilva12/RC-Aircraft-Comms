@@ -21,8 +21,8 @@ clear, clc, close all
 
 sbbf = zeros(1,1024);
 
-sbbf(10) = 512;
 sbbf(2) = 512;
+sbbf(512+10) = 512;
 
 sbb = ifft(sbbf);
 
